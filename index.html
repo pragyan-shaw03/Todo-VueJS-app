@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"/>
+    <title>Document</title>
+</head>
+<body>
+    <div class="container w-50 bg-success d-flex flex-column align-items-center p-5 gap-5 mt-5 rounded-4" id="app">
+        <h1>To-do App</h1>
+        <div class="inp">
+            <input type="text" class="rounded-2 p-2" @keyup.enter="addTask" v-model="inputTask" placeholder="Enter Task">
+            <button class="btn btn-md btn-warning ms-2" @click="addTask">Add Task</button>
+        </div>
+        <table class="table">
+            <thead>
+              <tr>
+                <th scope="col">#</th>
+                <th scope="col">Task</th>
+                <th scope="col">Edit</th>
+                <th scope="col">Delete</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="item, i in filteredItems" :key="i">
+                <th scope="row">{{i+1}}</th>
+                <td>{{item}}</td>
+                <td><button class="btn btn-outline" @click="editTask(i)"><i class="fa-duotone fa-solid fa-pen-to-square"></i></button></td>
+                <td><button class="btn btn-outline" @click="removeTask(i)"><i class="fa-solid fa-trash"></i></button></td>
+              </tr>  
+            </tbody>
+          </table>
+    </div>
+
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script>
+        let app = Vue.createApp({
+            data() {
+                return {
+                    items: [],
+                    currentId: 1,
+                    inputTask: ''
+                }
+            },
+            computed: {
+                filteredItems() {
+                    return this.items;
+                }
+            },
+            methods: {
+                addTask() {
+                    if (this.inputTask.length === 0) return;
+                    this.items.push(this.inputTask);
+                },
+                removeTask(i) {
+                    this.items.splice(i, 1);
+                },
+                editTask(i) {
+                    this.inputTask = this.items[i];
+                    this.removeTask(i);
+                }
+            }
+        })
+        app.mount('#app');
+    </script>
+</body>
+</html>
