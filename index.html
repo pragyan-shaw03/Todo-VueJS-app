@@ -1,37 +1,50 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="bootstrap/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"/>
-    <title>Document</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" />
+    <title>To-Do App</title>
+    <style>
+        .line {
+            text-decoration: line-through;
+            font-weight: 100;
+        }
+    </style>
 </head>
+
 <body>
     <div class="container bg-success d-flex flex-column align-items-center p-5 gap-5 mt-5 rounded-4" id="app">
         <h1>To-do App</h1>
         <div class="inp">
-            <input type="text" class="rounded-2 p-2" @keyup.enter="addTask" v-model="inputTask" placeholder="Enter Task">
+            <input type="text" class="rounded-2 p-2" @keyup.enter="addTask" v-model="inputTask"
+                placeholder="Enter Task">
             <button class="btn btn-md btn-warning ms-2" @click="addTask">Add Task</button>
         </div>
         <table class="table">
             <thead>
-              <tr>
-                <th scope="col">#</th>
-                <th scope="col">Task</th>
-                <th scope="col">Edit</th>
-                <th scope="col">Delete</th>
-              </tr>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Task</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Edit</th>
+                    <th scope="col">Delete</th>
+                </tr>
             </thead>
             <tbody>
-              <tr v-for="item, i in filteredItems" :key="i">
-                <th scope="row">{{i+1}}</th>
-                <td>{{item}}</td>
-                <td><button class="btn btn-outline" @click="editTask(i)"><i class="fa-duotone fa-solid fa-pen-to-square"></i></button></td>
-                <td><button class="btn btn-outline" @click="removeTask(i)"><i class="fa-solid fa-trash"></i></button></td>
-              </tr>  
+                <tr v-for="item, i in filteredItems" :key="i">
+                    <th scope="row">{{i+1}}</th>
+                    <td :id="'task'+ i">{{item.task}}</td>
+                    <td><button class="btn btn-outline btn-sm" @click="statusClicked(i)">{{item.status}}</button></td>
+                    <td><button class="btn btn-outline" @click="editTask(i)"><i
+                                class="fa-duotone fa-solid fa-pen-to-square"></i></button></td>
+                    <td><button class="btn btn-outline" @click="removeTask(i)"><i
+                                class="fa-solid fa-trash"></i></button></td>
+                </tr>
             </tbody>
-          </table>
+        </table>
     </div>
 
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
@@ -40,7 +53,7 @@
             data() {
                 return {
                     items: [],
-                    currentId: 1,
+                    edited: null,
                     inputTask: ''
                 }
             },
@@ -51,19 +64,43 @@
             },
             methods: {
                 addTask() {
+                    if (this.edited) {
+                        this.edited.task = this.inputTask;
+                        this.edited = null;
+                        return;
+                    }
                     if (this.inputTask.length === 0) return;
-                    this.items.push(this.inputTask);
+                    this.items.push({ task: this.inputTask, status: 'in-progress' });
                 },
                 removeTask(i) {
                     this.items.splice(i, 1);
                 },
                 editTask(i) {
-                    this.inputTask = this.items[i];
-                    this.removeTask(i);
+                    this.inputTask = this.items[i].task;
+                    this.edited = this.items[i];
+                },
+                statusClicked(i) {
+                    if (this.items[i].status === 'in-progress') {
+                        this.items[i].status = 'completed';
+
+                    } else {
+                        this.items[i].status = 'in-progress';
+                    }
+                    this.$nextTick(() => {
+                        const element = document.querySelector(`#task${i}`);
+                        if (element) {
+                            if (this.items[i].status === 'completed') {
+                                element.classList.add('line');
+                            } else {
+                                element.classList.remove('line');
+                            }
+                        }
+                    });
                 }
             }
         })
         app.mount('#app');
     </script>
 </body>
+
 </html>
