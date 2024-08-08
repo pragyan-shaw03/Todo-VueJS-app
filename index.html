@@ -67,10 +67,12 @@
                     if (this.edited) {
                         this.edited.task = this.inputTask;
                         this.edited = null;
+                        this.inputTask = '';
                         return;
                     }
                     if (this.inputTask.length === 0) return;
                     this.items.push({ task: this.inputTask, status: 'in-progress' });
+                    this.inputTask = '';
                 },
                 removeTask(i) {
                     this.items.splice(i, 1);
