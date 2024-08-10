@@ -12,11 +12,14 @@
             text-decoration: line-through;
             font-weight: 100;
         }
+        [v-cloak] {
+            display: none !important;
+        }
     </style>
 </head>
 
 <body>
-    <div class="container bg-success d-flex flex-column align-items-center p-5 gap-5 mt-5 rounded-4" id="app">
+    <div class="container bg-success d-flex flex-column align-items-center p-5 gap-5 mt-5 rounded-4" id="app" v-cloak>
         <h1>To-do App</h1>
         <div class="inp">
             <input type="text" class="rounded-2 p-2" @keyup.enter="addTask" v-model="inputTask"
@@ -46,13 +49,12 @@
             </tbody>
         </table>
     </div>
-
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <script>
         let app = Vue.createApp({
             data() {
                 return {
-                    items: [],
+                    items: JSON.parse(localStorage.getItem('tasks')) || [],
                     edited: null,
                     inputTask: ''
                 }
@@ -63,19 +65,25 @@
                 }
             },
             methods: {
+                addToLocalStorage() {
+                    localStorage.setItem('tasks', JSON.stringify(this.items));
+                },
                 addTask() {
                     if (this.edited) {
                         this.edited.task = this.inputTask;
                         this.edited = null;
                         this.inputTask = '';
+                        this.addToLocalStorage();
                         return;
                     }
                     if (this.inputTask.length === 0) return;
                     this.items.push({ task: this.inputTask, status: 'in-progress' });
                     this.inputTask = '';
+                    this.addToLocalStorage();
                 },
                 removeTask(i) {
                     this.items.splice(i, 1);
+                    this.addToLocalStorage();
                 },
                 editTask(i) {
                     this.inputTask = this.items[i].task;
@@ -98,6 +106,7 @@
                             }
                         }
                     });
+                    this.addToLocalStorage();
                 }
             }
         })
